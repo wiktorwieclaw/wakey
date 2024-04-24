@@ -1,0 +1,28 @@
+[package]
+name = "wakey"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "wakey"
+test = false
+bench = false
+
+[profile.dev]
+opt-level = "s"
+
+[profile.release]
+codegen-units = 1
+debug = 2
+debug-assertions = false
+incremental = false
+opt-level = 's'
+lto = 'fat'
+overflow-checks = false
+
+[dependencies]
+embassy-executor = { version = "0.5.0" }
+embassy-time = { version = "0.3.0", features = ["generic-queue-8"]}
+esp-backtrace = { version = "0.11.1", features = ["esp32", "exception-handler", "panic-handler", "println"] }
+esp-hal = { version = "0.17.0", features = ["esp32", "embassy", "embassy-executor-thread", "embassy-time-timg0"] }
+esp-println = { version = "0.9.1", features = ["log", "esp32"] }
