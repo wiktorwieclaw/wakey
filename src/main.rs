@@ -21,17 +21,20 @@ use esp_wifi::{
 };
 use static_cell::make_static;
 
-#[embassy_executor::task]
-async fn run_network_stack(stack: &'static embassy_net::Stack<WifiDevice<'static, WifiApDevice>>) {
-    stack.run().await
-}
+type Led = Gpio2<Output<PushPull>>;
+type NetworkStack = embassy_net::Stack<WifiDevice<'static, WifiApDevice>>;
 
 #[embassy_executor::task]
-async fn blink(mut led: Gpio2<Output<PushPull>>) {
+async fn blink(mut led: Led) {
     loop {
         led.toggle();
         Timer::after(Duration::from_secs(1)).await;
     }
+}
+
+#[embassy_executor::task]
+async fn run_network_stack(stack: &'static NetworkStack) {
+    stack.run().await
 }
 
 #[main]
@@ -56,7 +59,6 @@ async fn main(spawner: Spawner) {
         &clocks,
     )
     .unwrap();
-
     let (wifi_device, wifi_controller) =
         esp_wifi::wifi::new_with_mode(&wifi_initalization, peripherals.WIFI, WifiApDevice).unwrap();
     let network_config = embassy_net::Config::ipv4_static(StaticConfigV4 {
